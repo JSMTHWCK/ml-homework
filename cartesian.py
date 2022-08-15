@@ -12,5 +12,5 @@ def calc_cartesian_product(ranges):
     return cp
 
 print(calc_cartesian_product([['a'],[1,2,3],['Y','Z']]))
-
+print(calc_cartesian_product([['a','b'],['c','d'],['e','f'],['g']]))
 
