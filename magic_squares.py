@@ -174,8 +174,8 @@ def backtrack():
                                             for i in range(0,3):
                                                 print([squares[i*3 + 0],squares[i*3 + 1],squares[i* 3 + 2]])
                                             print('')
-'''
 #a = bruteforce()
+'''
 print('')
 print('')
 print('')
