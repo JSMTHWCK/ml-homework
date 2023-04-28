@@ -190,7 +190,7 @@ class Tests:
             
             
     def max_depth_test(self):
-        depth_sizes = [i for i in range(0,10)]
+        depth_sizes = [i for i in range(1,10)]
         results = []
         for depth in depth_sizes:
             results.append(self.loocv(1,depth))
@@ -233,6 +233,6 @@ data = [
 a = Tree()
 
 test = Tests(a,data)
-print(test.loocv_forest(2,10))
+print(test.max_depth_test())
 
  
