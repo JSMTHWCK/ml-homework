@@ -1,8 +1,8 @@
 import numpy as np
 class NeuralNetwork:
     def __init__(self,points,weights,bias):
-        self.outputs_by_layer = []
-        self.sigma_by_layer = []
+        self.outputs_by_layer = [np.array([[0]])]
+        self.sigma_by_layer = [[0]]
         self.rss_dh_by_layer = []
         self.rss_da_by_layer = []
         self.rss_db_by_layer = []
@@ -24,8 +24,6 @@ class NeuralNetwork:
         return sigmoid_values
         
     def forwardprop(self):
-        self.outputs_by_layer.append([np.array([[0]])])
-        self.sigma_by_layer.append([np.array([0])])
         for i in range(len(self.weights)): 
             prod = np.matmul(self.weights[i],self.outputs_by_layer[i])
             self.sigma_by_layer.append(prod + self.bias[i])
@@ -72,6 +70,6 @@ a = NeuralNetwork(
     ])
 
 a.forwardprop()
-a.forwardprop()
+a.backprop()
+a.expansion()
 
-print('done')
