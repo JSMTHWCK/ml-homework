@@ -1,8 +1,8 @@
 import numpy as np
 class NeuralNetwork:
     def __init__(self,points,weights,bias):
-        self.outputs_by_layer = [np.array([[0]])]
-        self.sigma_by_layer = [[0]]
+        self.outputs_by_layer = []
+        self.sigma_by_layer = []
         self.rss_dh_by_layer = []
         self.rss_da_by_layer = []
         self.rss_db_by_layer = []
@@ -10,7 +10,13 @@ class NeuralNetwork:
         self.weights = weights
         self.bias = bias
 
+    """ HELPERS FUNCTIONS"""
 
+    def addarrays(self,arr1,arr2):
+        arr_sum = []
+        for i in range(0,len(arr1)):
+            arr_sum.append(np.array(arr1[i]) + np.array(arr2[i]))
+        return arr_sum
     def sigmoid(self,values):
         sigmoid_values = []
         for value in values:
@@ -22,33 +28,42 @@ class NeuralNetwork:
         for value in values:
             sigmoid_values.append((np.e ** (-1 * value))/((1 + np.e ** (-1 * value)) ** 2))
         return sigmoid_values
-        
-    def forwardprop(self):
+    
+
+    """ ACTUAL FUNCTIONS """
+    def forwardprop(self,point):
+        outputs_by_layer = [np.array([[point[0]]])]
+        sigma_by_layer = [np.array([point[1]])]
+
         for i in range(len(self.weights)): 
-            prod = np.matmul(self.weights[i],self.outputs_by_layer[i])
-            self.sigma_by_layer.append(prod + self.bias[i])
-            self.outputs_by_layer.append(self.sigmoid(self.sigma_by_layer[-1]))
-        print(self.outputs_by_layer[-1])
-
-
+            prod = np.matmul(self.weights[i],outputs_by_layer[i])
+            sigma_by_layer.append(prod + self.bias[i])
+            outputs_by_layer.append(self.sigmoid(sigma_by_layer[-1]))
+        self.outputs_by_layer.append(np.array(outputs_by_layer,dtype=object))
+        self.sigma_by_layer.append(np.array(sigma_by_layer,dtype=object))
     def backprop(self):
-        self.rss_dh_by_layer.append(2 * (self.outputs_by_layer[-1][0] - 0))
+        index = len(self.outputs_by_layer) - 1
+        rss_dh_by_layer = []
+        rss_dh_by_layer.append(2 * (self.outputs_by_layer[index][-1][0] - 0))
         for i in range(len(self.weights),1,-1):
             transpose = np.asmatrix(self.weights[i - 1]).transpose()
             transpose = np.asarray(transpose)
-            product = np.multiply(self.rss_dh_by_layer[0], self.dSigmoid(self.sigma_by_layer[i]))
-            self.rss_dh_by_layer.insert(0,np.matmul(transpose, product))
-        print(self.rss_dh_by_layer[0])
+            product = np.multiply(rss_dh_by_layer[0], self.dSigmoid(self.sigma_by_layer[index][i]))
+            rss_dh_by_layer.insert(0,np.matmul(transpose, product))
+        self.rss_dh_by_layer.append(np.array(rss_dh_by_layer))
 
     def expansion(self):
-        for i in range(len(self.sigma_by_layer) - 1):
+        rss_da_by_layer = []
+        rss_db_by_layer = []
+        index = len(self.rss_dh_by_layer) - 1
+        for i in range(len(self.sigma_by_layer)):
             #rssdb
-            dSigmoid = self.dSigmoid(self.sigma_by_layer[-i - 1])
-            self.rss_db_by_layer.append(np.multiply(self.rss_dh_by_layer[-1-i],dSigmoid))
+            dSigmoid = self.dSigmoid(self.sigma_by_layer[index][-i - 1])
+            rss_db_by_layer.append(np.multiply(self.rss_dh_by_layer[index][-i],dSigmoid))
             #rssda
-            self.rss_da_by_layer.append(np.outer(self.rss_db_by_layer[-1-i], self.outputs_by_layer[-i-2]))
-        print(self.rss_db_by_layer)
-        
+            rss_da_by_layer.append(np.outer(rss_db_by_layer[-1-i], self.outputs_by_layer[index][-i-2]))
+        self.rss_da_by_layer.append(rss_da_by_layer)
+        self.rss_db_by_layer.append(rss_db_by_layer)
 a = NeuralNetwork(
     #points#
     [
@@ -69,7 +84,9 @@ a = NeuralNetwork(
     np.array([[-2.5]])
     ])
 
-a.forwardprop()
-a.backprop()
-a.expansion()
-
+for point in a.points:
+    a.forwardprop(point)
+print(a.sigma_by_layer[0])
+print(a.sigma_by_layer[1])
+print()
+print(a.addarrays(a.sigma_by_layer[0],a.sigma_by_layer[1]))
